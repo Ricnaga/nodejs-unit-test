@@ -18,12 +18,14 @@ export class UsersRepository implements IUsersRepository {
   }
 
   async findById(user_id: string): Promise<User | undefined> {
-    return this.repository.findOne(user_id);
+    const findUser = await this.repository.findOne(user_id);
+    return findUser
   }
 
   async create({ name, email, password }: ICreateUserDTO): Promise<User> {
     const user = this.repository.create({ name, email, password });
 
-    return this.repository.save(user);
+    await this.repository.save(user);
+    return user
   }
 }
