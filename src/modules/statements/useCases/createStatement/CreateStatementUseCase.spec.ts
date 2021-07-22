@@ -85,16 +85,4 @@ describe('Create Statement UseCase', () => {
 
   })
 
-  // it('should not be able to create the same user twice', async () => {
-  //   expect(async () => {
-  //     const user = {
-  //       name: 'usuario',
-  //       email: 'usuario@test.com.br',
-  //       password: '123456'
-  //     }
-
-  //     await createUserUseCase.execute(user)
-  //     await createUserUseCase.execute(user)
-  //   }).rejects.toBeInstanceOf(CreateUserError)
-  // })
 })
