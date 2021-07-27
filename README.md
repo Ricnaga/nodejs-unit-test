@@ -1,4 +1,4 @@
 # teste unitários
 Jest
 Postgres
-Dockerfile
+docker compose

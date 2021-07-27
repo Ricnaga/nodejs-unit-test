@@ -74,52 +74,27 @@ describe('Get Statement Operation Use Case', () => {
   })
 
   it('should not be able to get info about withdraw or deposit from a non existent user', async () => {
-    expect(async () => {
-      const depositStatement: ICreateStatementDTO = {
-        user_id: 'non-existent id',
-        amount: 1550,
-        description: "Description test",
-        type: "deposit" as OperationType,
-      }
-
-      const withdrawStatement: ICreateStatementDTO = {
-        user_id:'non-existent id',
-        amount: 550,
-        description: "Description test",
-        type: "withdraw" as OperationType,
-      }
-
-      const createDepositStatement = await createStatementUseCase.execute(depositStatement)
-      const createWithdrawStatement = await createStatementUseCase.execute(withdrawStatement)
-
-      if (createDepositStatement.id) {
-        await getStatementOperationUseCase.execute({
-          user_id: 'non-existent id', statement_id:
-            createDepositStatement.id
+      await expect(
+        getStatementOperationUseCase.execute({
+          user_id: 'wrong-id', statement_id:
+            'non-existent-statement'
         })
-      }
-
-      if (createWithdrawStatement.id) {
-        await getStatementOperationUseCase.execute({
-          user_id: 'non-existent id', statement_id:
-          createWithdrawStatement.id
-        })
-      }
-    }).rejects.toBeInstanceOf(GetStatementOperationError.UserNotFound)
+      ).rejects.toEqual(new GetStatementOperationError.UserNotFound)
   })
 
   it('should not be able to get info about withdraw or deposit from a non existent statement', async () => {
-    expect(async () => {
-      const user = await inMemoryUsersRepository.findByEmail("Usuario@email.com.br")
+    const user = await inMemoryUsersRepository.findByEmail("Usuario@email.com.br")
 
-      if (user?.id) {
-        await getStatementOperationUseCase.execute({
+    if (user?.id) {
+
+      await expect(
+        getStatementOperationUseCase.execute({
           user_id: user.id, statement_id:
             'non-existent-statement'
         })
+      ).rejects.toEqual(new GetStatementOperationError.StatementNotFound)
+    }
 
-      }
-    }).rejects.toBeInstanceOf(GetStatementOperationError.StatementNotFound)
   })
 
 })

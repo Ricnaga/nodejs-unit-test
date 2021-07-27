@@ -43,46 +43,43 @@ describe('Create Statement UseCase', () => {
 
   })
 
-  it('should not be able to do any operation with a non existent user', () => {
-    expect(async () => {
-      const user_id = 'non-existent-id'
+  it('should not be able to do any operation with a non existent user', async () => {
+    const user_id = 'non-existent-id'
 
-        const statementCreated: ICreateStatementDTO = {
-          user_id,
-          amount: 1550.0,
-          description: "Description test",
-          type: "withdraw" as OperationType,
-        }
+    const statementCreated: ICreateStatementDTO = {
+      user_id,
+      amount: 1550.0,
+      description: "Description test",
+      type: "withdraw" as OperationType,
+    }
 
-       await createStatementUseCase.execute(statementCreated)
-
-    }).rejects.toBeInstanceOf(CreateStatementError.UserNotFound)
+    await expect(
+      createStatementUseCase.execute(statementCreated)
+    ).rejects.toEqual(new CreateStatementError.UserNotFound)
 
   })
 
-  it('should not be able to do withdraw bigger than amount on statement', () => {
-    expect(async () => {
-      const newUser: ICreateUserDTO = {
-        email: "user@email.com.br",
-        name: "User test",
-        password: "123456"
+  it('should not be able to do withdraw bigger than amount on statement', async () => {
+    const newUser: ICreateUserDTO = {
+      email: "user@email.com.br",
+      name: "User test",
+      password: "123456"
+    }
+
+    const user = await inMemoryUsersRepository.create(newUser)
+
+    if (user.id) {
+      const statementCreated: ICreateStatementDTO = {
+        user_id: user.id,
+        amount: 1550.0,
+        description: "Description test",
+        type: "withdraw" as OperationType,
       }
 
-      const user = await inMemoryUsersRepository.create(newUser)
-
-      if (user.id) {
-        const statementCreated: ICreateStatementDTO = {
-          user_id: user.id,
-          amount: 1550.0,
-          description: "Description test",
-          type: "withdraw" as OperationType,
-        }
-
-        await createStatementUseCase.execute(statementCreated)
-
-      }
-    }).rejects.toBeInstanceOf(CreateStatementError.InsufficientFunds)
-
+      await expect(
+        createStatementUseCase.execute(statementCreated)
+      ).rejects.toEqual(new CreateStatementError.InsufficientFunds)
+    }
   })
 
 })

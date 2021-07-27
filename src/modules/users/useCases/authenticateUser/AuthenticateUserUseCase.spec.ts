@@ -1,9 +1,11 @@
 import { InMemoryUsersRepository } from '../../repositories/in-memory/InMemoryUsersRepository'
+import { CreateUserUseCase } from '../createUser/CreateUserUseCase'
 import { AuthenticateUserUseCase } from './AuthenticateUserUseCase'
 import { IncorrectEmailOrPasswordError } from './IncorrectEmailOrPasswordError'
-
+import authConfig from '../../../../config/auth';
 let inMemoryUsersRepository: InMemoryUsersRepository
 let authenticateUserUseCase: AuthenticateUserUseCase
+let createUserUseCase: CreateUserUseCase
 
 describe('Authenticate User Use Case', () => {
   beforeEach(() => {
@@ -11,16 +13,19 @@ describe('Authenticate User Use Case', () => {
     authenticateUserUseCase = new AuthenticateUserUseCase(
       inMemoryUsersRepository
     )
+    createUserUseCase = new CreateUserUseCase(
+      inMemoryUsersRepository
+    )
   })
 
   it('should be able to get info about authenticated user', async () => {
     const user = {
-      email: "teste@email.com.br",
-      name: "Usuario teste",
+      email: "teste1@email.com.br",
+      name: "Usuario_teste1",
       password: "123456"
     }
 
-    await inMemoryUsersRepository.create(user)
+    await createUserUseCase.execute(user)
 
     const authenticatedUser = await authenticateUserUseCase.execute({
       email: user.email,
@@ -31,36 +36,36 @@ describe('Authenticate User Use Case', () => {
   })
 
   it('should not be able to get info about a non existent user', async () => {
-    expect(async () => {
-      const user = {
-        email: "teste@email.com.br",
-        name: "Usuario teste",
-        password: "123456"
-      }
+    const user = {
+      email: "teste2@email.com.br",
+      name: "Usuario_teste2",
+      password: "123456"
+    }
 
-      await inMemoryUsersRepository.create(user)
+    const createdUser = await createUserUseCase.execute(user)
 
-      await authenticateUserUseCase.execute({
+    await expect(
+      authenticateUserUseCase.execute({
         email: 'wrong@email.com.br',
-        password: user.password
+        password: createdUser.password
       })
-    }).rejects.toBeInstanceOf(IncorrectEmailOrPasswordError)
+    ).rejects.toEqual(new IncorrectEmailOrPasswordError())
   })
 
   it('should not be able to get info about an user with wrong password', async () => {
-    expect(async () => {
-      const user = {
-        email: "teste@email.com.br",
-        name: "Usuario teste",
-        password: "123456"
-      }
+    const user = {
+      email: "teste3@email.com.br",
+      name: "Usuario_teste3",
+      password: "123456"
+    }
 
-      await inMemoryUsersRepository.create(user)
+    const createdUser = await createUserUseCase.execute(user)
 
-      await authenticateUserUseCase.execute({
-        email: user.email,
+    await expect(
+      authenticateUserUseCase.execute({
+        email: createdUser.email,
         password: 'wrong-password'
       })
-    }).rejects.toBeInstanceOf(IncorrectEmailOrPasswordError)
+    ).rejects.toEqual(new IncorrectEmailOrPasswordError())
   })
 })
