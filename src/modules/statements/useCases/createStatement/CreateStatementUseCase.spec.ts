@@ -33,7 +33,7 @@ describe('Create Statement UseCase', () => {
         user_id: user.id,
         amount: 1550.0,
         description: "Description test",
-        type: "deposit" as OperationType,
+        type: OperationType.DEPOSIT,
       }
 
       const createStatement = await createStatementUseCase.execute(statementCreated)
@@ -50,7 +50,7 @@ describe('Create Statement UseCase', () => {
       user_id,
       amount: 1550.0,
       description: "Description test",
-      type: "withdraw" as OperationType,
+      type: OperationType.WITHDRAW,
     }
 
     await expect(
@@ -73,7 +73,7 @@ describe('Create Statement UseCase', () => {
         user_id: user.id,
         amount: 1550.0,
         description: "Description test",
-        type: "withdraw" as OperationType,
+        type: OperationType.WITHDRAW,
       }
 
       await expect(
