@@ -12,4 +12,5 @@ export namespace CreateStatementError {
       super('Insufficient funds', 400);
     }
   }
+
 }
